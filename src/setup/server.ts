@@ -12,6 +12,12 @@ app.get('/', (_req: any, res: any) => {
 });
 
 io.on('connection', (socket: Socket) => {
+  socket.emit('message', socket.id + ' connected on video-watcher namespace');
   console.log('a user connected');
   socket.on('disconnect', () => console.log('user disconnected'));
+});
+
+io.use((socket: Socket, next: any) => {
+  console.log('global-middleware');
+  next();
 });
