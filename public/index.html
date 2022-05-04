@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Socket Drawing POC</title>
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
+    <script type="text/javascript" src="./sketch.js"></script>
+  </head>
+  <body>
+    <form>
+      <section>
+        <label>Nome:</label>
+        <input
+          type="text"
+          name="nickname"
+          defaultValue="unknown"
+          id="name-input"
+        />
+      </section>
+      <section>
+        <label>Cor:</label>
+        <input
+          type="color"
+          name="color"
+          defaultValue="#000000"
+          id="color-btn"
+        />
+        <span id="selected-color">#000000</span>
+      </section>
+      <section>
+        <label>Stroke Width:</label>
+        <input
+          type="number"
+          min="0"
+          max="10"
+          name="stroke_width"
+          deafultValue="2"
+          placeholder="Entre 0 e 10"
+          id="stroke-width-picker"
+          class="stroke_width_picker"
+        />
+        <span class="error-msg" id="stroke_width_error"></span>
+      </section>
+      <!-- <button type="button" id="stroke-btn">Change stroke width</button> -->
+    </form>
+    <aside id="connections">
+      <span>Conexões:</span>
+      <ul id="users"></ul>
+    </aside>
+  </body>
+</html>
