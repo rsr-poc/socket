@@ -6,3 +6,9 @@ export interface SocketDraw {
   color: string;
   strokeWidth: number;
 }
+
+export interface User {
+  id: string;
+  color: string;
+  name?: string;
+}

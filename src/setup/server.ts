@@ -4,13 +4,24 @@ const express = require('express');
 const app = express();
 const http = require('http');
 
+const { instrument } = require('@socket.io/admin-ui');
 const { Server: SocketIOServer } = require('socket.io');
 
 export const httpServer = http.createServer(app);
 export const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: '*',
+    origin: [
+      'http://localhost:8080',
+      'http://localhost:5000',
+      'https://admin.socket.io',
+    ],
+    methods: '*',
+    credentials: true,
   },
+});
+
+instrument(io, {
+  auth: false,
 });
 
 app.use(express.static('public'));

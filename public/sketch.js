@@ -4,6 +4,8 @@ let strokeWidth = 4;
 let canvas;
 let colorPicker;
 let selectedColor;
+let nickname;
+
 const MIN_STROKE_WIDTH = 1;
 const MAX_STROKE_WIDTH = 10;
 
@@ -13,19 +15,25 @@ function setup() {
   centerCanvas();
   canvas.background(255, 255, 255);
 
+  color = getItem('color') || '#000';
+
   selectedColor = select('#selected-color');
   selectedColor.html(color);
 
   colorPicker = select('#color-btn');
+  colorPicker.value(color);
   colorPicker.changed(changeColorEvent);
+
+  nickname = select('#nickname').changed(changeNameEvent);
 
   // Start the socket connection
   socket = io.connect('/draw');
 
   socket.on('connect', () => {
-    const usersList = select('#users');
-    const user = createElement('li', socket.id);
-    user.parent(usersList);
+    setTimeout(() => {
+      changeColorEvent();
+      changeNameEvent();
+    }, 100);
   });
 
   // Callback function
@@ -38,11 +46,19 @@ function setup() {
   socket.on('state', (data) => {
     const { state, users } = data;
 
+    const usersList = select('#users');
+    usersList.html('');
+
     users.forEach((user) => {
-      const usersList = select('#users');
-      const userElement = createElement('li', user);
+      const userElement = createElement('li', user?.name ?? user.id);
+      userElement.style('color', user.color);
       userElement.parent(usersList);
     });
+
+    if (!state.length) {
+      canvas.background(255, 255, 255);
+      return;
+    }
 
     state.forEach((draw) => {
       stroke(draw.color);
@@ -57,7 +73,11 @@ function setup() {
 
   const strokeWidthPicker = select('#stroke-width-picker');
 
-  // Adding a mousePressed listener to the button
+  select('#clean').mousePressed(() => {
+    canvas.background(255, 255, 255);
+    socket.emit('clean');
+  });
+
   strokeWidthPicker.changed(() => {
     const errorMessage = select('#stroke_width_error');
     const width = parseInt(strokeWidthPicker.value());
@@ -75,7 +95,6 @@ function setup() {
 
 function windowResized() {
   centerCanvas();
-  canvas.resizeCanvas(windowWidth / 2, windowHeight / 2, false);
 }
 
 function centerCanvas() {
@@ -109,13 +128,24 @@ function sendmouse(x, y, pX, pY) {
 }
 
 function changeColorEvent() {
-  console.log('changed color');
   if (/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(colorPicker.value())) {
     color = colorPicker.value();
-    console.log(color);
+    storeItem('color', color);
   }
 
   selectedColor.html(color);
   selectedColor.style('color', color);
   socket.emit('change-color', color);
+}
+
+function changeNameEvent() {
+  if (getItem('nickname')) {
+    nickname = getItem('nickname');
+    select('#nickname').value(nickname);
+  } else {
+    nickname = select('#nickname').value();
+    storeItem('nickname', nickname);
+  }
+
+  if (nickname) socket.emit('change-name', nickname);
 }
